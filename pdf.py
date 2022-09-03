@@ -1,7 +1,7 @@
 import os
 
 from PIL import Image
-from PyPDF2 import PdfFileWriter, PdfFileReader, PdfMerger
+from PyPDF2 import PdfFileWriter, PdfFileReader
 import main
 import shutil
 
@@ -33,7 +33,7 @@ def crea_pdf(start: int, end: int):
         writer.write(f)
     for chapter in range(start, end + 1):
         os.remove(f"{chapter}.pdf")
-        shutil.rmtree(f"Chapters\\{chapter}")
+    shutil.rmtree("Chapters")
 
 
-crea_pdf(1022, 1024)
+crea_pdf(1017, 1019)
