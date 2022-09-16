@@ -1,10 +1,8 @@
 import os
-
 from PIL import Image
-from PyPDF2 import PdfFileWriter, PdfFileReader
+from PyPDF2 import  PdfReader,PdfMerger
 import main
 import shutil
-
 
 def conv_rgba_to_rgb(file) -> Image.Image:
     rgba = Image.open(file)
@@ -13,27 +11,32 @@ def conv_rgba_to_rgb(file) -> Image.Image:
     return rgb
 
 
-def crea_pdf(start: int, end: int):
+
+def create_pdfs(start: int, end: int):
     dictionary = main.download_chapter(start, end)
+    merger=PdfMerger()
     for chapter, lenght in dictionary.items():
         images = [
-            conv_rgba_to_rgb(f"Chapters\\{chapter}\\{i}.jpg") for i in range(lenght)
+            conv_rgba_to_rgb(f"{chapter}\\{i}.jpg") for i in range(lenght)
         ]
         images[0].save(f"{chapter}.pdf", "PDF", append_images=images[1:], save_all=True)
-    writer = PdfFileWriter()
-    i = 0
-    for chapter, lenght in dictionary.items():
-        reader = PdfFileReader(f"{chapter}.pdf")
-        for pagina in range(lenght):
-            writer.add_page(reader.getPage(pagina))
-        writer.addBookmark(f"{chapter}", i)
-        i = i + lenght
+        merger.append(f'{chapter}.pdf',f'{chapter}')
+    merger.write(f'{start}-{end}.pdf')
+    merger.close()
+    for chapter in dictionary.keys():
+        os.remove(f'{chapter}.pdf')
 
-    with open(f"{start}-{end}.pdf", "wb") as f:
-        writer.write(f)
-    for chapter in range(start, end + 1):
-        os.remove(f"{chapter}.pdf")
-    shutil.rmtree("Chapters")
+def add_pdf(chapter:int,file:str):
+    lenght=main.download_chapter(chapter)
+    crea_pdf(chapter,lenght)
+    merger=PdfMerger()
+    reader = PdfReader(f'{file}.pdf')
+    outlines = reader.getOutlines()
+    merger.append(f'{file}.pdf')
+    merger.append(f'{str(chapter)}.pdf',f'{chapter}')
+    for outline in outlines:
+        merger.add_bookmark(outline['/Title'],outline['/Page'])
+    merger.write(f'{file}+{str(chapter)}.pdf')
+    merger.close()
+    shutil.rmtree(f'{str(chapter)}')
 
-
-crea_pdf(1017, 1019)
