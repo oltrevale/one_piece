@@ -31,7 +31,7 @@ def download_chapters(
     import os
 
     if not end_chapter:
-        os.makedirs(f"{start_chapter}")
+        os.makedirs(str(start_chapter))
         links = return_links(start_chapter)
         for i, link in enumerate(links):
             with open(f"{start_chapter}\\{i}.jpg", "wb") as f:

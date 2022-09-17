@@ -43,7 +43,7 @@ def add_pdf(file: str, chapter: int):
     os.remove(f"{file}.pdf")
 
 
-def download_pdf_chapter(chapter):
+def download_pdf_chapter(chapter: int):
     lenght = download.download_chapters(chapter)
     images = [conv_rgba_to_rgb(f"{chapter}\\{i}.jpg") for i in range(lenght)]
     images[0].save(f"temp.pdf", "PDF", append_images=images[1:], save_all=True)
@@ -57,7 +57,7 @@ def download_pdf_chapter(chapter):
     shutil.rmtree(str(chapter))
 
 
-def last_chapter_in_pdf(file, last_chapter):
+def last_chapter_in_pdf(file: str, last_chapter: int):
     reader = PdfReader(f"{file}.pdf")
     outlines = reader.outlines
     chapter = int(outlines[-1]["/Title"])
@@ -67,15 +67,11 @@ def last_chapter_in_pdf(file, last_chapter):
         return False
 
 
-def add_last_chapter(file):
+def get_last_chapter() -> int:
     lista = download.list_chapter_link()
     link = lista[-1]
     chapter = link.split("-")[-1]
-    if last_chapter_in_pdf(file, chapter):
-        print("ultimo capitolo gia presente")
-    else:
-        add_pdf(int(chapter), file)
-
+    return int(chapter)
 
 def next_chapter(file: str) -> int:
     reader = PdfReader(f"{file}.pdf")
@@ -89,7 +85,7 @@ def previous_chapter(file: str) -> int:
     return min(int(outline["/Title"]) for outline in outlines) - 1
 
 
-def add_pdf_start(file: str, chapter: int):
+def add_pdf_begin(file: str, chapter: int):
     lenght = download.download_chapters(chapter)
     images = [conv_rgba_to_rgb(f"{chapter}\\{i}.jpg") for i in range(lenght)]
     images[0].save(f"{chapter}.pdf", "PDF", append_images=images[1:], save_all=True)
