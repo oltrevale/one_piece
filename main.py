@@ -18,7 +18,7 @@ if sys.argv[1] == "addlast":
             shutil.rmtree(str(chapter))
         except:
             shutil.rmtree(str(chapter))
-        if not pdf.last_chapter_in_pdf():
+        if not pdf.last_chapter_in_pdf(sys.argv[2], chapter):
             pdf.add_pdf(sys.argv[2], chapter)
         else:
             print("last chapter already present")
@@ -89,9 +89,11 @@ elif sys.argv[1] == "addprev":
         print(f"{sys.argv[2]} doesn t exits")
     except FileExistsError:
         try:
+            chapter = pdf.previous_chapter(sys.argv[2])
             os.remove(f"{chapter}.pdf")
             shutil.rmtree(str(chapter))
         except:
+            chapter = pdf.previous_chapter(sys.argv[2])
             shutil.rmtree(str(chapter))
         chapter = pdf.previous_chapter(sys.argv[2])
         pdf.add_pdf_begin(sys.argv[2], chapter)

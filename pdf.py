@@ -15,8 +15,8 @@ def conv_rgba_to_rgb(file: str) -> Image.Image:
 def download_chapter_pdfs(start, end, name):
     page_len = download.download_chapters(start, end)
     merger = PdfMerger()
-    for chapter, lenght in page_len.items():
-        images = [conv_rgba_to_rgb(f"{chapter}\\{i}.jpg") for i in range(lenght)]
+    for chapter, length in page_len.items():
+        images = [conv_rgba_to_rgb(f"{chapter}\\{i}.jpg") for i in range(length)]
         images[0].save(f"{chapter}.pdf", "PDF", append_images=images[1:], save_all=True)
         merger.append(f"{chapter}.pdf", f"{chapter}")
     merger.write(f"{name}.pdf")
@@ -27,8 +27,8 @@ def download_chapter_pdfs(start, end, name):
 
 
 def add_pdf(file: str, chapter: int):
-    lenght = download.download_chapters(chapter)
-    images = [conv_rgba_to_rgb(f"{chapter}\\{i}.jpg") for i in range(lenght)]
+    length = download.download_chapters(chapter)
+    images = [conv_rgba_to_rgb(f"{chapter}\\{i}.jpg") for i in range(length)]
     images[0].save(f"{chapter}.pdf", "PDF", append_images=images[1:], save_all=True)
     merger = PdfMerger()
     reader = PdfReader(f"{file}.pdf")
@@ -44,12 +44,12 @@ def add_pdf(file: str, chapter: int):
 
 
 def download_pdf_chapter(chapter: int):
-    lenght = download.download_chapters(chapter)
-    images = [conv_rgba_to_rgb(f"{chapter}\\{i}.jpg") for i in range(lenght)]
+    length = download.download_chapters(chapter)
+    images = [conv_rgba_to_rgb(f"{chapter}\\{i}.jpg") for i in range(length)]
     images[0].save(f"temp.pdf", "PDF", append_images=images[1:], save_all=True)
     reader = PdfReader(f"temp.pdf")
     writer = PdfWriter()
-    for page in range(lenght):
+    for page in range(length):
         writer.addPage(reader.getPage(page))
     writer.addBookmark(str(chapter), 0)
     writer.write(f"{chapter}.pdf")
@@ -73,6 +73,7 @@ def get_last_chapter() -> int:
     chapter = link.split("-")[-1]
     return int(chapter)
 
+
 def next_chapter(file: str) -> int:
     reader = PdfReader(f"{file}.pdf")
     outlines = reader.getOutlines()
@@ -86,8 +87,8 @@ def previous_chapter(file: str) -> int:
 
 
 def add_pdf_begin(file: str, chapter: int):
-    lenght = download.download_chapters(chapter)
-    images = [conv_rgba_to_rgb(f"{chapter}\\{i}.jpg") for i in range(lenght)]
+    length = download.download_chapters(chapter)
+    images = [conv_rgba_to_rgb(f"{chapter}\\{i}.jpg") for i in range(length)]
     images[0].save(f"{chapter}.pdf", "PDF", append_images=images[1:], save_all=True)
     merger = PdfMerger()
     reader = PdfReader(f"{file}.pdf")
@@ -96,7 +97,7 @@ def add_pdf_begin(file: str, chapter: int):
     merger.append(f"{file}.pdf")
     merger.add_bookmark(str(chapter), 0)
     for outline in outlines:
-        merger.add_bookmark(outline["/Title"], int(outline["/Page"]) + lenght)
+        merger.add_bookmark(outline["/Title"], int(outline["/Page"]) + length)
     merger.write(f"{chapter}+{file}.pdf")
     merger.close()
     os.remove(f"{chapter}.pdf")
