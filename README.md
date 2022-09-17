@@ -23,7 +23,7 @@ py main.py download {begin_chapter} {end_chapter}
 ```
 
 #### add
-to downloada and add a chapter  to a  chapter or range of chapter in pdf file created by this program
+to download and add a chapter to a chapter or range of chapter in pdf file created by this program
 
 ```
 py main.py add {nome file without extension} {chapter to download}
@@ -31,7 +31,7 @@ py main.py add {nome file without extension} {chapter to download}
 
 
 #### addlast
-to download and add add last chapter  to a chapter or range of chapter in pdf file created by this program
+to download and add last chapter  to a chapter or range of chapter in pdf file created by this program
 ```
 py main.py addlast {nome file without extension}
 ```
