@@ -4,7 +4,7 @@
 - bookmarks
 - add previous , next , last chapter to a pdf (for now you can only add pdf created by this program and and you can onyl)
 ## Guide
-### Install
+### Install requirements
 ```
 pip install -r requirements.txt
  ```
