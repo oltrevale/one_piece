@@ -1,6 +1,6 @@
 # DOWNLOAD  ONE-PIECE CHAPTERS
 ## Feautures
-- download last chapter or a range of chapters in pdf format 
+- download chapter or a range of chapters in pdf format 
 - bookmarks
 - add previous , next , last chapter to a pdf (for now you can add only pdf created by this program and and you can onyl)
 ## Guide
