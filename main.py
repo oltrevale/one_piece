@@ -1,102 +1,79 @@
 import pdf
 import sys
-import os
-import shutil
+
 
 if sys.argv[1] == "addlast":
-    chapter = pdf.get_last_chapter()
-    try:
-        if not pdf.last_chapter_in_pdf(sys.argv[2], chapter):
-            pdf.add_pdf(sys.argv[2], chapter)
-        else:
-            print("last chapter already present")
-    except FileNotFoundError:
-        print(f"{sys.argv[2]} doesn t exits")
-    except FileExistsError:
-        try:
-            os.remove(str(chapter))
-            shutil.rmtree(str(chapter))
-        except:
-            shutil.rmtree(str(chapter))
-        if not pdf.last_chapter_in_pdf(sys.argv[2], chapter):
-            pdf.add_pdf(sys.argv[2], chapter)
-        else:
-            print("last chapter already present")
+    last_chapter = pdf.get_last_chapter()
+    if not pdf.last_chapter_in_pdf(sys.argv[2], last_chapter):
+        pdf.download_chapter_pdfs(last_chapter, last_chapter, last_chapter)
+        pdf.merge_pdf(sys.argv[2], last_chapter, f"{sys.argv[2]}+{last_chapter}")
+    else:
+        print("last chapter already present")
 
 elif sys.argv[1] == "download":
     if len(sys.argv) == 3:
         try:
-            pdf.download_pdf_chapter(int(sys.argv[2]))
-        except FileExistsError:
-            try:
-                os.remove(f"{sys.argv[2]}.pdf")
-                shutil.rmtree(sys.argv[2])
-            except:
-                shutil.rmtree(sys.argv[2])
-            pdf.download_pdf_chapter(int(sys.argv[2]))
-        except:
+            pdf.download_chapter_pdfs(int(sys.argv[2]), int(sys.argv[2]), sys.argv[2])
+        except ValueError:
             print("type a downloadable chapter")
     elif len(sys.argv) == 4:
         try:
             pdf.download_chapter_pdfs(
                 int(sys.argv[2]), int(sys.argv[3]), f"{sys.argv[2]}-{sys.argv[3]}"
             )
-        except FileExistsError:
-            for chapter in range(int(sys.argv[2]), int(sys.argv[3]) + 1):
-                try:
-                    os.remove(f"{chapter}.pdf")
-                    shutil.rmtree(str(chapter))
-                except:
-                    shutil.rmtree((str(chapter)))
-            pdf.download_chapter_pdfs(
-                int(sys.argv[2]), int(sys.argv[3]), f"{sys.argv[2]}-{sys.argv[3]}"
-            )
-        except:
+        except ValueError:
             print("type range downloadable chapter like 400 500")
 elif sys.argv[1] == "add":
     try:
-        pdf.add_pdf(sys.argv[2], int(sys.argv[3]))
-    except FileExistsError:
-        try:
-            os.remove(f"{sys.argv[2]}.pdf")
-            shutil.rmtree(sys.argv[2])
-        except:
-            shutil.rmtree(sys.argv[2])
-
-        pdf.add_pdf(sys.argv[2], int(sys.argv[3]))
+        pdf.download_chapter_pdfs(int(sys.argv[3]), int(sys.argv[3]), int(sys.argv[3]))
+        pdf.merge_pdf(sys.argv[2], sys.argv[3], f"{sys.argv[2]}+{sys.argv[3]}")
     except FileNotFoundError:
-        print(f"{sys.argv[2]} doesn t exits")
+        print(f"{sys.argv[2]}.pdf doesn t exits")
 elif sys.argv[1] == "addnext":
     try:
-        chapter = pdf.next_chapter(sys.argv[2])
-        pdf.add_pdf(sys.argv[2], chapter)
-    except FileExistsError:
-        try:
-            os.remove(f"{sys.argv[2]}.pdf")
-            shutil.rmtree(sys.argv[2])
-        except:
-            shutil.rmtree(sys.argv[2])
-        chapter = pdf.next_chapter(sys.argv[2])
-        pdf.add_pdf(sys.argv[2], chapter)
+        next_chapter = pdf.get_next_chapter(sys.argv[2])
+        pdf.download_chapter_pdfs(next_chapter, next_chapter, next_chapter)
+        pdf.merge_pdf(sys.argv[2], next_chapter, f"{sys.argv[2]}+{next_chapter}")
     except FileNotFoundError:
-        print(f"{sys.argv[2]} doesn t exits")
+        print(f"{sys.argv[2]}.pdf doesn t exits")
 
 elif sys.argv[1] == "addprev":
     try:
-        chapter = pdf.previous_chapter(sys.argv[2])
-        pdf.add_pdf_begin(sys.argv[2], chapter)
+        prev_chapter = pdf.get_previous_chapter(sys.argv[2])
+        pdf.download_chapter_pdfs(prev_chapter, prev_chapter, prev_chapter)
+        pdf.merge_pdf(str(prev_chapter), sys.argv[2], f"{prev_chapter}+{sys.argv[2]}")
     except FileNotFoundError:
-        print(f"{sys.argv[2]} doesn t exits")
-    except FileExistsError:
-        try:
-            chapter = pdf.previous_chapter(sys.argv[2])
-            os.remove(f"{chapter}.pdf")
-            shutil.rmtree(str(chapter))
-        except:
-            chapter = pdf.previous_chapter(sys.argv[2])
-            shutil.rmtree(str(chapter))
-        chapter = pdf.previous_chapter(sys.argv[2])
-        pdf.add_pdf_begin(sys.argv[2], chapter)
+        print(f"{sys.argv[2]}.pdf doesn t exits")
+elif sys.argv[1] == "remuntada":
+    last_chapter = pdf.get_last_chapter()
+    try:
+        if pdf.last_chapter_in_pdf(sys.argv[2], last_chapter):
+            print("last chapter already exits in this file")
+            quit()
+        else:
+            next_chapter = pdf.get_next_chapter(f"{sys.argv[2]}")
+    except FileNotFoundError:
+        print(f"{sys.argv[2]}.pdf doesn t exits")
+        quit()
+    except:
+        "unable to retrieve number of this chapter"
+        quit()
+    if next_chapter == last_chapter:
+        pdf.download_chapter_pdfs(next_chapter, last_chapter, f"{next_chapter}")
+        pdf.merge_pdf(
+            sys.argv[2],
+            f"{next_chapter}",
+            f"{sys.argv[2]}+{last_chapter}",
+        )
+    else:
+        pdf.download_chapter_pdfs(
+            next_chapter, last_chapter, f"{next_chapter}-{last_chapter}"
+        )
+        pdf.merge_pdf(
+            sys.argv[2],
+            f"{next_chapter}-{last_chapter}",
+            f"{sys.argv[2]}-{last_chapter}",
+        )
 
 else:
-    print("type download,addlast,add,addnext,addprev")
+    print("guide here https://github.com/oltrevale/one_piece")

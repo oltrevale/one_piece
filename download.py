@@ -2,8 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                  "Chrome/104.0.5112.102 Safari/537.36 Edg/104.0.1293.70 "
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36 Edg/104.0.1293.70"
 }
 
 
@@ -26,25 +25,22 @@ def return_links(chapter: int) -> list[str]:
     return [im["src"] for im in img]
 
 
-def download_chapters(
-        start_chapter: int, end_chapter: int | None = None
-) -> dict[int, int] | int:
+def download_chapters(start_chapter: int, end_chapter: int) -> dict[int, int]:
     import os
 
-    if not end_chapter:
-        os.makedirs(str(start_chapter))
-        links = return_links(start_chapter)
-        for i, link in enumerate(links):
-            with open(f"{start_chapter}\\{i}.jpg", "wb") as f:
-                f.write(requests.get(link).content)
-        return len(links)
-    else:
-        page_len = {}
-        for chapter in range(start_chapter, end_chapter + 1):
+    page_len = {}
+    for chapter in range(start_chapter, end_chapter + 1):
+        try:
             os.makedirs(f"{chapter}")
-            links = return_links(chapter)
-            page_len[chapter] = len(links)
-            for i, link in enumerate(links):
-                with open(f"{chapter}\\{i}.jpg", "wb") as f:
-                    f.write(requests.get(link).content)
-        return page_len
+        except FileExistsError:
+            pass
+        print("retriving links")
+        links = return_links(chapter)
+        page_len[chapter] = len(links)
+        for i, link in enumerate(links):
+            with open(f"{chapter}\\{i}.jpg", "wb") as f:
+                print(f"downloading page {i}/{len(links)-1}")
+                f.write(requests.get(link).content)
+        print(f"chapter {chapter} downloaded")
+
+    return page_len

@@ -1,5 +1,6 @@
+from genericpath import isfile
 import os
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from PyPDF2 import PdfReader, PdfMerger, PdfWriter
 import download
 import shutil
@@ -13,48 +14,67 @@ def conv_rgba_to_rgb(file: str) -> Image.Image:
 
 
 def download_chapter_pdfs(start, end, name):
-    page_len = download.download_chapters(start, end)
-    merger = PdfMerger()
-    for chapter, length in page_len.items():
-        images = [conv_rgba_to_rgb(f"{chapter}\\{i}.jpg") for i in range(length)]
-        images[0].save(f"{chapter}.pdf", "PDF", append_images=images[1:], save_all=True)
-        merger.append(f"{chapter}.pdf", f"{chapter}")
-    merger.write(f"{name}.pdf")
-    merger.close()
-    for chapter in page_len.keys():
-        os.remove(f"{chapter}.pdf")
-        shutil.rmtree(f"{str(chapter)}")
+    if os.path.isfile(f"{name}.pdf"):
+        print("file is already downloaded")
+    else:
+        if start != end:
+            page_len = download.download_chapters(start, end)
+            merger = PdfMerger()
+            for chapter, length in page_len.items():
+                files = [f"{chapter}\\{i}.jpg" for i in range(length)]
+                try:
+
+                    images = [conv_rgba_to_rgb(file) for file in files]
+
+                except:
+                    images = []
+                    for file in files:
+                        try:
+                            image = conv_rgba_to_rgb(file)
+                            images.append(image)
+                        except UnidentifiedImageError:
+                            pass
+                images[0].save(
+                    f"{chapter}.pdf", "PDF", append_images=images[1:], save_all=True
+                )
+
+                shutil.rmtree(f"{str(chapter)}")
+                print(f"\n {chapter} converted in pdf")
+                merger.append(f"{chapter}.pdf", f"{chapter}")
+            merger.write(f"{name}.pdf")
+            merger.close()
+
+        else:
+            page_len = download.download_chapters(start, end)
+            files = [f"{start}\\{i}.jpg" for i in range(page_len[start])]
+            try:
+
+                images = [conv_rgba_to_rgb(file) for file in files]
+            except:
+                images = []
+                for file in files:
+                    try:
+                        image = conv_rgba_to_rgb(file)
+                        images.append(image)
+                    except:
+                        print("lost a image")
+            images[0].save(f"temp.pdf", "PDF", append_images=images[1:], save_all=True)
+            reader = PdfReader(f"temp.pdf")
+            writer = PdfWriter()
+            for page in range(len(images)):
+                writer.addPage(reader.getPage(page))
+            writer.addBookmark(str(start), 0)
+            writer.write(f"{start}.pdf")
+            os.remove("temp.pdf")
+            shutil.rmtree(str(start))
+            print(f"\n \n {name}.pdf file created")
 
 
-def add_pdf(file: str, chapter: int):
-    length = download.download_chapters(chapter)
-    images = [conv_rgba_to_rgb(f"{chapter}\\{i}.jpg") for i in range(length)]
-    images[0].save(f"{chapter}.pdf", "PDF", append_images=images[1:], save_all=True)
-    merger = PdfMerger()
-    reader = PdfReader(f"{file}.pdf")
-    outlines = reader.getOutlines()
-    merger.append(f"{file}.pdf")
-    merger.append(f"{str(chapter)}.pdf", f"{chapter}")
-    for outline in outlines:
-        merger.add_bookmark(outline["/Title"], outline["/Page"])
-    merger.write(f"{file}+{str(chapter)}.pdf")
-    merger.close()
-    shutil.rmtree(f"{str(chapter)}")
-    os.remove(f"{file}.pdf")
-
-
-def download_pdf_chapter(chapter: int):
-    length = download.download_chapters(chapter)
-    images = [conv_rgba_to_rgb(f"{chapter}\\{i}.jpg") for i in range(length)]
-    images[0].save(f"temp.pdf", "PDF", append_images=images[1:], save_all=True)
-    reader = PdfReader(f"temp.pdf")
-    writer = PdfWriter()
-    for page in range(length):
-        writer.addPage(reader.getPage(page))
-    writer.addBookmark(str(chapter), 0)
-    writer.write(f"{chapter}.pdf")
-    os.remove("temp.pdf")
-    shutil.rmtree(str(chapter))
+def get_last_chapter() -> int:
+    lista = download.list_chapter_link()
+    link = lista[-1]
+    chapter = link.split("-")[-1]
+    return int(chapter)
 
 
 def last_chapter_in_pdf(file: str, last_chapter: int):
@@ -67,38 +87,34 @@ def last_chapter_in_pdf(file: str, last_chapter: int):
         return False
 
 
-def get_last_chapter() -> int:
-    lista = download.list_chapter_link()
-    link = lista[-1]
-    chapter = link.split("-")[-1]
-    return int(chapter)
-
-
-def next_chapter(file: str) -> int:
+def get_next_chapter(file: str) -> int:
     reader = PdfReader(f"{file}.pdf")
     outlines = reader.getOutlines()
     return max(int(outline["/Title"]) for outline in outlines) + 1
 
 
-def previous_chapter(file: str) -> int:
+def get_previous_chapter(file: str) -> int:
     reader = PdfReader(f"{file}.pdf")
     outlines = reader.getOutlines()
     return min(int(outline["/Title"]) for outline in outlines) - 1
 
 
-def add_pdf_begin(file: str, chapter: int):
-    length = download.download_chapters(chapter)
-    images = [conv_rgba_to_rgb(f"{chapter}\\{i}.jpg") for i in range(length)]
-    images[0].save(f"{chapter}.pdf", "PDF", append_images=images[1:], save_all=True)
-    merger = PdfMerger()
-    reader = PdfReader(f"{file}.pdf")
-    outlines = reader.getOutlines()
-    merger.append(f"{chapter}.pdf")
-    merger.append(f"{file}.pdf")
-    merger.add_bookmark(str(chapter), 0)
-    for outline in outlines:
-        merger.add_bookmark(outline["/Title"], int(outline["/Page"]) + length)
-    merger.write(f"{chapter}+{file}.pdf")
-    merger.close()
-    os.remove(f"{chapter}.pdf")
-    shutil.rmtree(str(chapter))
+def merge_pdf(file, file2, name):
+    if os.path.isfile(f"{name}.pdf"):
+        pass
+    else:
+        reader = PdfReader(f"{file}.pdf")
+        reader2 = PdfReader(f"{file2}.pdf")
+        num_pages = reader.getNumPages()
+        outlines = reader.getOutlines()
+        outlines2 = reader2.getOutlines()
+        merger = PdfMerger()
+        merger.append(f"{file}.pdf")
+        merger.append(f"{file2}.pdf")
+        for outline in outlines:
+            merger.add_bookmark(outline["/Title"], outline["/Page"])
+        for outline in outlines2:
+            merger.add_bookmark(outline["/Title"], outline["/Page"] + num_pages)
+        merger.write(f"{name}.pdf")
+        merger.close()
+        print(f"{name}.pdf created")
