@@ -2,7 +2,7 @@
 ## Feautures
 - download chapter or a range of chapters in pdf format 
 - bookmarks
-- add previous , next , last chapter to a pdf (for now you can only add pdf created by this program and and you can onyl)
+- add previous , next , last or range of chapter to a pdf (for now you can only add pdf created by this program)
 ## Guide
 ### Install requirements
 ```
@@ -19,17 +19,24 @@ py main.py download {chapter}
 to download from begin_chapter to end_chapter
 
 ```
-py main.py download {begin_chapter} {end_chapter}
+py main.py download {start_chapter} {end_chapter}
 ```
-
+#### remuntada
+to download and add a range of chapter ,from last chapter in pdf to one piece's last chapter, to a file
+```
+py main.py remuntada {file without extension}
+```
 #### add
-to download and add a chapter to a chapter or range of chapter in pdf file created by this program
+to download and add a chapter to a file created by this program
 
 ```
 py main.py add {nome file without extension} {chapter to download}
 ```
 
-
+to download and add a range of chapters to a file created by this program
+```
+py main.py add {nome file without extension} {start_chapter} {end_chapter}
+```
 #### addlast
 to download and add last chapter  to a chapter or range of chapter in pdf file created by this program
 ```
