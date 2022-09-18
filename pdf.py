@@ -13,7 +13,7 @@ def conv_rgba_to_rgb(file: str) -> Image.Image:
     return rgb
 
 
-def download_chapter_pdfs(start, end, name):
+def download_chapter_pdfs(start: int, end: int, name: int | str):
     if os.path.isfile(f"{name}.pdf"):
         print("file is already downloaded")
     else:
@@ -39,7 +39,7 @@ def download_chapter_pdfs(start, end, name):
                 )
 
                 shutil.rmtree(f"{str(chapter)}")
-                print(f"\n {chapter} converted in pdf")
+                print(f"\n{chapter} converted in pdf")
                 merger.append(f"{chapter}.pdf", f"{chapter}")
             merger.write(f"{name}.pdf")
             merger.close()
@@ -67,7 +67,7 @@ def download_chapter_pdfs(start, end, name):
             writer.write(f"{start}.pdf")
             os.remove("temp.pdf")
             shutil.rmtree(str(start))
-            print(f"\n \n {name}.pdf file created")
+    print(f"{name}.pdf file created")
 
 
 def get_last_chapter() -> int:
@@ -77,7 +77,7 @@ def get_last_chapter() -> int:
     return int(chapter)
 
 
-def last_chapter_in_pdf(file: str, last_chapter: int):
+def is_last_chapter_in_pdf(file: str, last_chapter: int) -> bool:
     reader = PdfReader(f"{file}.pdf")
     outlines = reader.outlines
     chapter = int(outlines[-1]["/Title"])
@@ -99,9 +99,9 @@ def get_previous_chapter(file: str) -> int:
     return min(int(outline["/Title"]) for outline in outlines) - 1
 
 
-def merge_pdf(file, file2, name):
+def merge_pdf(file: str | int, file2: str | int, name: str | int):
     if os.path.isfile(f"{name}.pdf"):
-        pass
+        print("file is already downloaded")
     else:
         reader = PdfReader(f"{file}.pdf")
         reader2 = PdfReader(f"{file2}.pdf")

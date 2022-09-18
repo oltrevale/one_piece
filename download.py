@@ -34,7 +34,7 @@ def download_chapters(start_chapter: int, end_chapter: int) -> dict[int, int]:
             os.makedirs(f"{chapter}")
         except FileExistsError:
             pass
-        print("retriving links")
+        print("retrieving links")
         links = return_links(chapter)
         page_len[chapter] = len(links)
         for i, link in enumerate(links):
@@ -42,5 +42,6 @@ def download_chapters(start_chapter: int, end_chapter: int) -> dict[int, int]:
                 print(f"downloading page {i}/{len(links)-1}")
                 f.write(requests.get(link).content)
         print(f"chapter {chapter} downloaded")
+        print("\n")
 
     return page_len
