@@ -1,4 +1,3 @@
-from genericpath import isfile
 import os
 from PIL import Image, UnidentifiedImageError
 from PyPDF2 import PdfReader, PdfMerger, PdfWriter
