@@ -24,29 +24,29 @@ py main.py download {start_chapter} {end_chapter}
 #### remuntada
 to download and add a range of chapter ,from last chapter in pdf to one piece latest chapter, to a file
 ```
-py main.py remuntada {file without extension}
+py main.py remuntada {namefile without extension}
 ```
 #### add
 to download and add a chapter to a file created by this program
 
 ```
-py main.py add {nome file without extension} {chapter to download}
+py main.py add {namefile without extension} {chapter to download}
 ```
 
 to download and add a range of chapters to a file created by this program
 ```
-py main.py add {nome file without extension} {start_chapter} {end_chapter}
+py main.py add {namefile without extension} {start_chapter} {end_chapter}
 ```
 #### addlast
 to download and add onepiece latest chapter  to a file created by this program
 ```
-py main.py addlast {nome file without extension}
+py main.py addlast {namefile without extension}
 ```
 
 #### addprev
 to download and add a previous chapter to a file created by this program
 ```
-py main.py addprev {nome filew without extension}
+py main.py addprev {namefile without extension}
 ```
 
 to download and add a range of previous chapters to a file crated by this program
