@@ -12,6 +12,12 @@ if sys.argv[1] == "addlast":
             print("last chapter already present")
     except:
         print(f"unable to retrieve chapters info from {sys.argv[2]}")
+elif sys.argv[1]=='last':
+    try:
+        last_chapter=pdf.get_last_chapter()
+        pdf.download_chapter_pdfs(last_chapter,last_chapter,last_chapter)
+    except:
+        print(f"unable to retrieve chapters info from {sys.argv[2]}")
 
 elif sys.argv[1] == "download":
     if len(sys.argv) == 3:
